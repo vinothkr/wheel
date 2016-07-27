@@ -16,14 +16,14 @@ class ByteBuffer {
 
     writeString(value) {
 	this.writeInt16(value.length);
-	this.buffer.write(value, this.start, value.length, 'UTF-8');
-	this.start += value.length + 2;
+	this.buffer.write(value, this.start, value.length);
+	this.start += value.length;
     }
     
     writeBytes(value) {
 	this.writeInt32(value.length);
 	(new Buffer(value)).copy(this.buffer, this.start, 0);
-	this.start += value.length + 4;
+	this.start += value.length;
     }
 
     readInt16() {
@@ -31,6 +31,26 @@ class ByteBuffer {
 	return this.buffer.readInt16BE(this.start - 2);
     }
     
+    readInt32() {
+	this.start +=4;
+	return this.buffer.readInt32BE(this.start - 4);
+    }
+    
+    readString() {
+	const size = this.readInt16();
+	this.start += size;
+	return this.buffer.toString('utf8', this.start - size, this.start);
+    }
+
+    readArrayOf(reader) {
+	const size = this.readInt32();
+	const result = [];
+	for(var i = 0; i < size; i ++) {
+	    result.push(reader(this));
+	}
+	return result;
+    }
+
     static withSize(size) {
 	return new ByteBuffer(new Buffer(size));
     }

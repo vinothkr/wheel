@@ -1,8 +1,10 @@
 const sizeOf = require('./sizes')
+const _ = require('lodash')
 
 class Request {
-    constructor(size) {
-	this.size = size
+    constructor(apiKey, size) {
+	this.apiKey = apiKey;
+	this.size = size;
     }
 
     writeTo(buffer) {
@@ -10,10 +12,26 @@ class Request {
     }
 }
 
+class TopicMetadata extends Request {
+    constructor(topics) {
+	super(3, _.sum(topics.map(sizeOf.string)));
+	this.topics = topics;
+    }
+
+    writeTo(buffer) {
+	buffer.writeInt32(this.topics.length);
+	for(var topic in this.topics) {
+	    buffer.writeString(topic);
+	}
+    }
+}
+
+
+
 
 class HeartBeat extends Request {
     constructor(groupId, generationId, memberId) {
-	super(sizeOf.string(groupId) + sizeOf.int32 + sizeOf.string(memberId));
+	super(12, sizeOf.string(groupId) + sizeOf.int32 + sizeOf.string(memberId));
 	this.groupId = groupId;
 	this.generationId = generationId;
 	this.memberId = memberId;
@@ -26,6 +44,8 @@ class HeartBeat extends Request {
     }
 }
 
+
 module.exports = {
-    'HeartBeat' : HeartBeat
+    'HeartBeat' : HeartBeat,
+    'TopicMetadata' : TopicMetadata
 };

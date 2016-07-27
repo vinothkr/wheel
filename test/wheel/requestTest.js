@@ -16,4 +16,16 @@ describe('Request', function() {
 	
 	mock.verify();
     });
+
+    it('should write TopicMetadata to buffer', function() {
+	const buffer = ByteBuffer.withSize(7)
+	const mock = sinon.mock(buffer);					   
+	const metadata = new request.TopicMetadata('topic');
+	
+	mock.expects('writeString').once().withArgs('topic');
+
+	metadata.writeTo(buffer);
+	
+	mock.verify();
+    });
 });

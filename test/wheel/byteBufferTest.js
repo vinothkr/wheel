@@ -3,11 +3,15 @@ const expect = require('chai').expect;
 
 describe('ByteBuffer', function() {
     it('should write int16 as 2 bytes', function() {
-	const buffer = ByteBuffer.withSize(2);
+	const buffer = ByteBuffer.withSize(4);
 	buffer.writeInt16(1);
+	buffer.writeInt16(2);
 
 	expect(buffer.buffer[0]).to.eql(0);
 	expect(buffer.buffer[1]).to.eql(1);
+	expect(buffer.buffer[2]).to.eql(0);
+	expect(buffer.buffer[3]).to.eql(2);
+
     });
 
     it('should write int32 as 4 bytes', function() {
